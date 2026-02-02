@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Be My Valentine</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #ffe0e6, #fff6f0);
+        font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 48px 56px;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(234, 76, 137, 0.2);
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0 0 28px;
+        font-size: 2rem;
+        color: #c2185b;
+      }
+
+      .buttons {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+      }
+
+      button {
+        border: none;
+        border-radius: 16px;
+        width: 240px;
+        height: 180px;
+        padding: 0 24px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      button:focus-visible {
+        outline: 3px solid #ff9bbf;
+        outline-offset: 3px;
+      }
+
+      .yes {
+        background-color: #ffffff;
+        background-image: url("happywendy.jpeg");
+        color: #fff;
+        border: 2px solid #ff9bbf;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+      }
+
+      .yes:focus-visible {
+        outline-color: #ffffff;
+      }
+
+      .no {
+        background-color: #ffffff;
+        background-image: url("sadwendy.jpeg");
+        color: #ffffff;
+        border: 2px solid #ff9bbf;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, left 0.1s ease,
+          top 0.1s ease;
+      }
+
+      .no-wrap {
+        width: 240px;
+        height: 180px;
+      }
+
+      .hearts {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 10;
+      }
+
+      .heart {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        background: #ff4d8d;
+        transform: rotate(45deg);
+        opacity: 0;
+        animation: heart-float 1.8s ease-in-out forwards;
+      }
+
+      .heart::before,
+      .heart::after {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        background: #ff4d8d;
+        border-radius: 50%;
+      }
+
+      .heart::before {
+        top: -9px;
+        left: 0;
+      }
+
+      .heart::after {
+        left: -9px;
+        top: 0;
+      }
+
+      @keyframes heart-float {
+        0% {
+          transform: translateY(0) rotate(45deg) scale(0.7);
+          opacity: 0;
+        }
+        20% {
+          opacity: 0.9;
+        }
+        100% {
+          transform: translateY(-60px) rotate(45deg) scale(1.1);
+          opacity: 0;
+        }
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 22px rgba(0, 0, 0, 0.18);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>Do you want to be my Valentine, Wendy?</h1>
+      <div class="buttons">
+        <button class="yes" type="button">Yes</button>
+        <div class="no-wrap">
+          <button class="no" type="button">No</button>
+        </div>
+      </div>
+    </main>
+    <div class="hearts" aria-hidden="true"></div>
+    <script>
+      const yesButton = document.querySelector(".yes");
+      const noButton = document.querySelector(".no");
+      const noWrap = document.querySelector(".no-wrap");
+      const heartsLayer = document.querySelector(".hearts");
+
+      const placeNoButtonAtCurrentSpot = () => {
+        const rect = noWrap.getBoundingClientRect();
+        noButton.style.position = "fixed";
+        noButton.style.left = `${rect.left}px`;
+        noButton.style.top = `${rect.top}px`;
+      };
+
+      const moveNoButton = (event) => {
+        const padding = 20;
+        const maxLeft = Math.max(
+          padding,
+          window.innerWidth - noButton.offsetWidth - padding
+        );
+        const maxTop = Math.max(
+          padding,
+          window.innerHeight - noButton.offsetHeight - padding
+        );
+        const cursorX = event?.clientX ?? window.innerWidth / 2;
+        const cursorY = event?.clientY ?? window.innerHeight / 2;
+        const safeRadius =
+          Math.max(noButton.offsetWidth, noButton.offsetHeight) / 2 + 40;
+
+        let left = padding;
+        let top = padding;
+        let attempts = 0;
+
+        while (attempts < 100) {
+          left = padding + Math.random() * (maxLeft - padding);
+          top = padding + Math.random() * (maxTop - padding);
+          const centerX = left + noButton.offsetWidth / 2;
+          const centerY = top + noButton.offsetHeight / 2;
+          const distance = Math.hypot(centerX - cursorX, centerY - cursorY);
+          if (distance > safeRadius) {
+            break;
+          }
+          attempts += 1;
+        }
+
+        noButton.style.left = `${left}px`;
+        noButton.style.top = `${top}px`;
+      };
+
+      window.addEventListener("load", placeNoButtonAtCurrentSpot);
+      noButton.addEventListener("mouseenter", moveNoButton);
+      window.addEventListener("resize", placeNoButtonAtCurrentSpot);
+
+      const createHeart = () => {
+        const heart = document.createElement("span");
+        heart.className = "heart";
+        const size = 14 + Math.random() * 14;
+        const left = Math.random() * 100;
+        const top = 55 + Math.random() * 35;
+        const duration = 1.2 + Math.random() * 0.8;
+        heart.style.width = `${size}px`;
+        heart.style.height = `${size}px`;
+        heart.style.left = `${left}vw`;
+        heart.style.top = `${top}vh`;
+        heart.style.animationDuration = `${duration}s`;
+        heart.style.background = Math.random() > 0.5 ? "#ff4d8d" : "#ff7bb2";
+        heartsLayer.appendChild(heart);
+        setTimeout(() => heart.remove(), duration * 1000);
+      };
+
+      const triggerHearts = () => {
+        const start = Date.now();
+        const interval = setInterval(() => {
+          createHeart();
+          createHeart();
+          if (Date.now() - start > 2200) {
+            clearInterval(interval);
+          }
+        }, 120);
+      };
+
+      yesButton.addEventListener("click", triggerHearts);
+    </script>
+  </body>
+</html>
